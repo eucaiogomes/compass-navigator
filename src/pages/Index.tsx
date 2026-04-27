@@ -11,7 +11,7 @@ const Index = () => {
   const [exporting, setExporting] = useState<{ id: string; type: "pdf" | "xlsx" } | null>(null);
   const [setorFiltro, setSetorFiltro] = useState<string>("Todos");
   const [visibleIds, setVisibleIds] = useState<string[]>(AVALIACOES.map((a) => a.id));
-  const [periodoFiltro, setPeriodoFiltro] = useState({ mes: "Abril", ano: "2026" });
+  const [periodoFiltro, setPeriodoFiltro] = useState({ mes: "Março", ano: "2026" });
 
   const setores = Array.from(new Set(AVALIACOES.map((a) => a.departamentoFoco)));
   const filterOptions = ["Todos", ...setores];
