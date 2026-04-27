@@ -38,6 +38,11 @@ export const PeriodFilterPopover = ({ periodo, onApply }: Props) => {
     setOpen(false);
   };
 
+  const handleClear = () => {
+    onApply({ mes: "", ano: "" });
+    setOpen(false);
+  };
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -121,10 +126,16 @@ export const PeriodFilterPopover = ({ periodo, onApply }: Props) => {
           </div>
         </div>
 
-        <div className="mt-6 flex justify-end">
+        <div className="mt-6 flex justify-end gap-3">
+          <button 
+            onClick={handleClear}
+            className="px-6 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Limpar
+          </button>
           <button 
             onClick={handleApply}
-            className="w-[200px] bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold py-2.5 rounded-full transition-colors flex items-center justify-center gap-2"
+            className="flex-1 bg-[#ea580c] hover:bg-[#c2410c] text-white font-bold py-2.5 rounded-full transition-colors flex items-center justify-center gap-2"
           >
             <CalendarIcon className="h-4 w-4" />
             Aplicar filtros
