@@ -12,6 +12,15 @@ import { RotateCcw, Move } from "lucide-react";
 const Index = () => {
   const [exporting, setExporting] = useState<{ id: string; type: "pdf" | "xlsx" } | null>(null);
   const [resetSignal, setResetSignal] = useState(0);
+  const [setorFiltro, setSetorFiltro] = useState<string>("Todos");
+
+  const setores = Array.from(new Set(AVALIACOES.map((a) => a.departamentoFoco)));
+  const filterOptions = ["Todos", ...setores];
+
+  const avaliacoesFiltradas =
+    setorFiltro === "Todos"
+      ? AVALIACOES
+      : AVALIACOES.filter((a) => a.departamentoFoco === setorFiltro);
 
   const handlePDF = async (av: Avaliacao) => {
     setExporting({ id: av.id, type: "pdf" });
@@ -41,7 +50,7 @@ const Index = () => {
     }
   };
 
-  const items = AVALIACOES.map((av) => ({
+  const items = avaliacoesFiltradas.map((av) => ({
     id: av.id,
     defaultH: 14,
     defaultW: 6,
@@ -68,7 +77,9 @@ const Index = () => {
               { label: "Minha Área" },
               { label: "NR-1", accent: true },
             ]}
-            filterLabel="Todos"
+            filterLabel={setorFiltro}
+            filterOptions={filterOptions}
+            onFilterChange={setSetorFiltro}
             periodLabel="Abril - 2026"
             onAdd={() => toast.info("Nova avaliação — em breve")}
           />

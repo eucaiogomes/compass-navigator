@@ -1,13 +1,28 @@
-import { ChevronDown, Calendar, Plus } from "lucide-react";
+import { ChevronDown, Calendar, Plus, Check } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Props {
   breadcrumb: { label: string; accent?: boolean }[];
   filterLabel?: string;
+  filterOptions?: string[];
+  onFilterChange?: (value: string) => void;
   periodLabel?: string;
   onAdd?: () => void;
 }
 
-export const PageBar = ({ breadcrumb, filterLabel = "Todos", periodLabel = "Abril - 2026", onAdd }: Props) => {
+export const PageBar = ({
+  breadcrumb,
+  filterLabel = "Todos",
+  filterOptions,
+  onFilterChange,
+  periodLabel = "Abril - 2026",
+  onAdd,
+}: Props) => {
   return (
     <div className="space-y-3">
       {/* Breadcrumb */}
@@ -22,10 +37,26 @@ export const PageBar = ({ breadcrumb, filterLabel = "Todos", periodLabel = "Abri
 
       {/* Filters row */}
       <div className="flex items-center gap-3 flex-wrap">
-        <button className="flex items-center justify-between gap-2 min-w-[140px] h-10 px-4 rounded-full border border-border bg-white text-sm text-muted-foreground hover:border-primary/30 transition-colors">
-          <span>{filterLabel}</span>
-          <ChevronDown className="h-4 w-4 text-accent" strokeWidth={2.5} />
-        </button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center justify-between gap-2 min-w-[180px] h-10 px-4 rounded-full border border-border bg-white text-sm text-foreground hover:border-primary/30 transition-colors">
+              <span className="truncate">{filterLabel}</span>
+              <ChevronDown className="h-4 w-4 text-accent shrink-0" strokeWidth={2.5} />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="min-w-[220px] bg-white">
+            {(filterOptions ?? ["Todos"]).map((opt) => (
+              <DropdownMenuItem
+                key={opt}
+                onClick={() => onFilterChange?.(opt)}
+                className="flex items-center justify-between cursor-pointer"
+              >
+                <span>{opt}</span>
+                {opt === filterLabel && <Check className="h-4 w-4 text-accent" />}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <button className="flex items-center justify-between gap-2 min-w-[170px] h-10 px-4 rounded-full border border-border bg-white text-sm text-muted-foreground hover:border-primary/30 transition-colors">
           <span>{periodLabel}</span>
