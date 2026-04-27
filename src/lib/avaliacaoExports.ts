@@ -5,6 +5,12 @@ import {
   ESCALA_COPSOQ, FAIXAS, INTERPRETACOES, RECOMENDACOES_DETALHADAS,
   FATORES_PROTETIVOS, FATORES_RISCO, REFERENCIAS, classificacaoTexto,
 } from "@/data/relatorioConteudo";
+import {
+  INTRODUCAO_COPSOQ, OBJETIVO_RELATORIO, COMPONENTES_RELATORIO,
+  IDENTIFICACAO_EMPRESA, RESPONSAVEL_TECNICO, METODOLOGIA_DETALHADA,
+  DIMENSOES_AVALIADAS, ANALISE_GLOBAL_TEXTO, RECOMENDACOES_POR_DOMINIO,
+  INTEGRACAO_PGR, REAPLICACAO_CRITERIOS, CONCLUSAO_TEXTO,
+} from "@/data/relatorioConteudoExtra";
 
 const NAVY: [number, number, number] = [16, 41, 70];
 const ORANGE: [number, number, number] = [243, 146, 0];
@@ -81,6 +87,98 @@ export function exportAvaliacaoPDF(av: Avaliacao) {
   pdf.setTextColor(255); pdf.setFontSize(9); pdf.setFont("helvetica", "bold");
   pdf.text(`Emitido em ${today}`, 20, H - 8);
   pdf.text("Confidencial — Uso Interno", W - 20, H - 8, { align: "right" });
+
+  // ---------- NOVAS PÁGINAS: INTRODUÇÃO E OBJETIVO ----------
+  let y2 = newPage(pdf, av, "Introdução — Avaliação Psicossocial COPSOQ II");
+  y2 = paragraph(pdf, INTRODUCAO_COPSOQ, y2, W);
+  y2 += 4;
+  if (y2 > H - 60) y2 = newPage(pdf, av, "Objetivo e Estrutura do Relatório");
+  y2 = sectionTitle(pdf, "Objetivo do Relatório Técnico", y2);
+  y2 = paragraph(pdf, OBJETIVO_RELATORIO, y2, W);
+  y2 += 4;
+  if (y2 > H - 60) y2 = newPage(pdf, av, "Componentes Essenciais do Relatório");
+  y2 = sectionTitle(pdf, "Componentes Essenciais do Relatório", y2);
+  COMPONENTES_RELATORIO.forEach((c) => {
+    if (y2 > H - 30) y2 = newPage(pdf, av, "Componentes Essenciais (cont.)");
+    pdf.setFont("helvetica", "bold"); pdf.setFontSize(10); pdf.setTextColor(...NAVY);
+    pdf.text(c.titulo, 20, y2);
+    y2 += 5;
+    y2 = paragraph(pdf, c.texto, y2, W);
+    y2 += 3;
+  });
+
+  // ---------- IDENTIFICAÇÃO DA EMPRESA E RESPONSÁVEL TÉCNICO ----------
+  y2 = newPage(pdf, av, "Identificação da Empresa e Responsável Técnico");
+  y2 = sectionTitle(pdf, "Dados da Empresa Avaliada", y2);
+  const empresaRows: [string, string][] = [
+    ["Razão Social", IDENTIFICACAO_EMPRESA.razaoSocial],
+    ["CNPJ", IDENTIFICACAO_EMPRESA.cnpj],
+    ["Endereço", IDENTIFICACAO_EMPRESA.endereco],
+    ["Data da Avaliação", IDENTIFICACAO_EMPRESA.dataAvaliacao],
+    ["Setores Avaliados", IDENTIFICACAO_EMPRESA.setoresAvaliados],
+  ];
+  empresaRows.forEach(([k, v]) => {
+    pdf.setFont("helvetica", "bold"); pdf.setFontSize(8.5); pdf.setTextColor(...MUTED);
+    pdf.text(k.toUpperCase(), 20, y2);
+    pdf.setFont("helvetica", "normal"); pdf.setFontSize(10); pdf.setTextColor(...NAVY);
+    pdf.text(v, 65, y2);
+    y2 += 6;
+  });
+  y2 += 2;
+  y2 = paragraph(pdf, IDENTIFICACAO_EMPRESA.contexto, y2, W);
+  y2 += 4;
+
+  if (y2 > H - 70) y2 = newPage(pdf, av, "Responsável Técnico pela Avaliação");
+  y2 = sectionTitle(pdf, "Responsável Técnico pela Avaliação", y2);
+  const respRows: [string, string][] = [
+    ["Nome", RESPONSAVEL_TECNICO.nome],
+    ["Registro Profissional", RESPONSAVEL_TECNICO.registroProfissional],
+    ["Especialidade", RESPONSAVEL_TECNICO.especialidade],
+    ["Contato", RESPONSAVEL_TECNICO.contato],
+  ];
+  respRows.forEach(([k, v]) => {
+    pdf.setFont("helvetica", "bold"); pdf.setFontSize(8.5); pdf.setTextColor(...MUTED);
+    pdf.text(k.toUpperCase(), 20, y2);
+    pdf.setFont("helvetica", "normal"); pdf.setFontSize(10); pdf.setTextColor(...NAVY);
+    pdf.text(v, 65, y2);
+    y2 += 6;
+  });
+  y2 += 2;
+  y2 = paragraph(pdf, RESPONSAVEL_TECNICO.texto, y2, W);
+
+  // ---------- METODOLOGIA DETALHADA E DIMENSÕES ----------
+  y2 = newPage(pdf, av, "Metodologia Detalhada e Dimensões Avaliadas");
+  y2 = paragraph(pdf, METODOLOGIA_DETALHADA, y2, W);
+  y2 += 4;
+  y2 = sectionTitle(pdf, "Dimensões Contempladas no Instrumento", y2);
+  DIMENSOES_AVALIADAS.forEach((d) => {
+    if (y2 > H - 15) y2 = newPage(pdf, av, "Dimensões Contempladas (cont.)");
+    pdf.setFillColor(...ORANGE); pdf.circle(22, y2 - 1.2, 0.8, "F");
+    pdf.setFont("helvetica", "normal"); pdf.setFontSize(9.5); pdf.setTextColor(40);
+    const lines = pdf.splitTextToSize(d, W - 50);
+    pdf.text(lines, 26, y2);
+    y2 += lines.length * 4.5 + 1;
+  });
+  y2 += 4;
+
+  // Perfil dos participantes (a partir dos dados da avaliação)
+  if (y2 > H - 60) y2 = newPage(pdf, av, "Perfil dos Participantes");
+  y2 = sectionTitle(pdf, "Perfil dos Participantes", y2);
+  const adesaoP = (av.totalRespondentes / av.totalConvidados) * 100;
+  const perfilRows: [string, string][] = [
+    ["Total de Respondentes", `${av.totalRespondentes} de ${av.totalConvidados} (${adesaoP.toFixed(1)}%)`],
+    ["Período de Aplicação", av.dataAplicacao],
+    ["Foco", av.departamentoFoco],
+    ["Responsável", av.responsavel],
+  ];
+  perfilRows.forEach(([k, v]) => {
+    pdf.setFont("helvetica", "bold"); pdf.setFontSize(8.5); pdf.setTextColor(...MUTED);
+    pdf.text(k.toUpperCase(), 20, y2);
+    pdf.setFont("helvetica", "normal"); pdf.setFontSize(10); pdf.setTextColor(...NAVY);
+    const vLines = pdf.splitTextToSize(v, W - 90);
+    pdf.text(vLines, 70, y2);
+    y2 += Math.max(6, vLines.length * 5 + 1);
+  });
 
   // ---------- PAGE 2: RESUMO EXECUTIVO ----------
   pdf.addPage();
@@ -271,6 +369,85 @@ export function exportAvaliacaoPDF(av: Avaliacao) {
     pdf.text(lines, 23, y);
     y += lines.length * 4 + 2;
   });
+
+  // ---------- ANÁLISE GLOBAL ----------
+  y = newPage(pdf, av, "Análise Global dos Resultados");
+  y = paragraph(pdf, ANALISE_GLOBAL_TEXTO, y, W);
+  y += 4;
+
+  // Resumo numérico das dimensões (mini-tabela)
+  pdf.setFont("helvetica", "bold"); pdf.setFontSize(8); pdf.setTextColor(...NAVY);
+  pdf.setFillColor(...LIGHT); pdf.rect(20, y, W - 40, 7, "F");
+  pdf.text("DIMENSÃO", 23, y + 5);
+  pdf.text("SCORE", W - 60, y + 5);
+  pdf.text("CLASSIFICAÇÃO", W - 38, y + 5);
+  y += 7;
+  av.ranking.forEach((d) => {
+    if (y > H - 20) y = newPage(pdf, av, "Análise Global (cont.)");
+    const cl = classificacaoTexto(d.score);
+    const c = colorForScore(d.score);
+    pdf.setFont("helvetica", "normal"); pdf.setFontSize(8.5); pdf.setTextColor(40);
+    pdf.text(d.dimension, 23, y + 5);
+    pdf.text(d.score.toFixed(2), W - 60, y + 5);
+    pdf.setFont("helvetica", "bold"); pdf.setTextColor(...c);
+    pdf.text(cl.label, W - 38, y + 5);
+    y += 6.5;
+    pdf.setDrawColor(230, 234, 240); pdf.line(20, y, W - 20, y);
+  });
+  y += 6;
+
+  // ---------- RECOMENDAÇÕES POR DOMÍNIO ----------
+  y = newPage(pdf, av, "Recomendações Técnicas por Domínio");
+  y = paragraph(pdf, "Recomendações organizadas por grandes domínios psicossociais, complementares ao plano de ação detalhado por dimensão. Aplicáveis como diretriz geral de intervenção.", y, W);
+  y += 4;
+  RECOMENDACOES_POR_DOMINIO.forEach((g) => {
+    if (y > H - 50) y = newPage(pdf, av, "Recomendações por Domínio (cont.)");
+    pdf.setFillColor(...NAVY); pdf.roundedRect(20, y, W - 40, 8, 1.5, 1.5, "F");
+    pdf.setTextColor(255); pdf.setFont("helvetica", "bold"); pdf.setFontSize(10);
+    pdf.text(g.dominio, 23, y + 5.5);
+    y += 11;
+    pdf.setTextColor(40); pdf.setFont("helvetica", "normal"); pdf.setFontSize(9);
+    g.acoes.forEach((a) => {
+      const lines = pdf.splitTextToSize(`•  ${a}`, W - 50);
+      if (y + lines.length * 4 > H - 20) y = newPage(pdf, av, "Recomendações por Domínio (cont.)");
+      pdf.text(lines, 25, y);
+      y += lines.length * 4 + 1;
+    });
+    y += 4;
+  });
+
+  // ---------- INTEGRAÇÃO AO PGR + REAPLICAÇÃO ----------
+  if (y > H - 80) y = newPage(pdf, av, "Integração ao PGR e Critérios de Reaplicação");
+  else y = sectionTitle(pdf, "Integração ao Plano de Ação do PGR", y);
+  y = paragraph(pdf, INTEGRACAO_PGR, y, W);
+  y += 4;
+
+  if (y > H - 60) y = newPage(pdf, av, "Critérios de Reaplicação");
+  y = sectionTitle(pdf, "Critérios de Reaplicação Antecipada", y);
+  y = paragraph(pdf, REAPLICACAO_CRITERIOS.observacao, y, W);
+  y += 2;
+  pdf.setFont("helvetica", "bold"); pdf.setFontSize(9); pdf.setTextColor(...NAVY);
+  pdf.text("Gatilhos para reaplicação fora do ciclo padrão:", 20, y);
+  y += 6;
+  REAPLICACAO_CRITERIOS.gatilhos.forEach((g) => {
+    if (y > H - 15) y = newPage(pdf, av, "Critérios de Reaplicação (cont.)");
+    pdf.setFillColor(...ORANGE); pdf.circle(22, y - 1.2, 0.8, "F");
+    pdf.setFont("helvetica", "normal"); pdf.setFontSize(9.5); pdf.setTextColor(40);
+    pdf.text(g, 26, y); y += 5.5;
+  });
+  y += 4;
+
+  // ---------- CONCLUSÃO ----------
+  if (y > H - 60) y = newPage(pdf, av, "Conclusão");
+  else y = sectionTitle(pdf, "Conclusão", y);
+  y = paragraph(pdf, CONCLUSAO_TEXTO, y, W);
+  y += 6;
+  pdf.setDrawColor(...ORANGE); pdf.setLineWidth(0.6); pdf.line(20, y, W - 20, y);
+  y += 6;
+  pdf.setFont("helvetica", "bold"); pdf.setFontSize(9.5); pdf.setTextColor(...NAVY);
+  pdf.text(`Relatório elaborado por: ${av.responsavel}`, 20, y); y += 5;
+  pdf.setFont("helvetica", "normal"); pdf.setFontSize(9); pdf.setTextColor(...MUTED);
+  pdf.text(`Data de emissão: ${today}`, 20, y);
 
   // ---------- FOOTERS ----------
   const pages = pdf.getNumberOfPages();
