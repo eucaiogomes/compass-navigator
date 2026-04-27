@@ -1,6 +1,19 @@
+import { useState } from "react";
 import { Avaliacao, avaliacaoMedia } from "@/data/avaliacoes";
 import { classificacaoTexto } from "@/data/relatorioConteudo";
-import { FileDown, FileSpreadsheet, Calendar, Users, Building2, GripVertical } from "lucide-react";
+import { FileDown, FileSpreadsheet, Calendar, Users, Building2, GripVertical, BarChart3 } from "lucide-react";
+import {
+  RankingChart,
+  CHART_TYPE_OPTIONS,
+  type ChartType,
+} from "@/components/dashboard/RankingChart";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Props {
   avaliacao: Avaliacao;
