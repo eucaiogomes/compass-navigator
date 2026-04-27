@@ -33,6 +33,7 @@ export const AvaliacaoCard = ({ avaliacao, onExportPDF, onExportXLS, exporting }
   const media = avaliacaoMedia(avaliacao);
   const cls = classificacaoTexto(media);
   const adesao = (avaliacao.totalRespondentes / avaliacao.totalConvidados) * 100;
+  const [chartType, setChartType] = useState<ChartType>("bars");
 
   const isExportingPdf = exporting?.id === avaliacao.id && exporting?.type === "pdf";
   const isExportingXls = exporting?.id === avaliacao.id && exporting?.type === "xlsx";
