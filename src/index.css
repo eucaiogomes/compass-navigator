@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,6 +7,32 @@
 /* COPSOQ II Executive Dashboard — Corporate Navy Design System.
    All colors MUST be HSL.
 */
+
+/* Vitrine brand tokens */
+:root {
+  --vitrine-primary: #324F7F;
+  --vitrine-secondary: #062365;
+  --vitrine-accent: #3b82f6;
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-sm;
+  }
+  .btn-primary {
+    @apply bg-[var(--vitrine-primary)] hover:bg-[var(--vitrine-secondary)] text-white px-6 py-2 rounded-full transition-all duration-200 font-medium;
+  }
+}
 
 @layer base {
   :root {

@@ -13,8 +13,12 @@ export default {
     extend: {
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
+        display: ["Outfit", "sans-serif"],
       },
       colors: {
+        "brand-primary": "var(--vitrine-primary)",
+        "brand-secondary": "var(--vitrine-secondary)",
+        "brand-accent": "var(--vitrine-accent)",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
