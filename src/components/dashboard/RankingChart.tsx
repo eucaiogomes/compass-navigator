@@ -108,7 +108,6 @@ export const RankingChart = ({
             <XAxis
               dataKey="name"
               tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
-              interval={0}
               angle={-35}
               textAnchor="end"
               height={70}
@@ -147,7 +146,7 @@ export const RankingChart = ({
     const totalScore = chartData.reduce((s, d) => s + d.value, 0);
     return (
       <div className="flex flex-col md:flex-row items-center gap-4">
-        <div style={{ height, width: height }} className="shrink-0 relative">
+        <div style={{ height, maxWidth: "100%", width: "min(100%, " + height + "px)" }} className="shrink-0 relative mx-auto">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -205,7 +204,7 @@ export const RankingChart = ({
     return (
       <div style={{ height }}>
         <ResponsiveContainer width="100%" height="100%">
-          <RadarChart data={chartData} outerRadius="75%">
+          <RadarChart data={chartData} outerRadius="65%" margin={{ top: 10, right: 25, bottom: 10, left: 25 }}>
             <PolarGrid stroke="hsl(var(--border))" />
             <PolarAngleAxis
               dataKey="dimension"
