@@ -88,6 +88,98 @@ export function exportAvaliacaoPDF(av: Avaliacao) {
   pdf.text(`Emitido em ${today}`, 20, H - 8);
   pdf.text("Confidencial — Uso Interno", W - 20, H - 8, { align: "right" });
 
+  // ---------- NOVAS PÁGINAS: INTRODUÇÃO E OBJETIVO ----------
+  let y2 = newPage(pdf, av, "Introdução — Avaliação Psicossocial COPSOQ II");
+  y2 = paragraph(pdf, INTRODUCAO_COPSOQ, y2, W);
+  y2 += 4;
+  if (y2 > H - 60) y2 = newPage(pdf, av, "Objetivo e Estrutura do Relatório");
+  y2 = sectionTitle(pdf, "Objetivo do Relatório Técnico", y2);
+  y2 = paragraph(pdf, OBJETIVO_RELATORIO, y2, W);
+  y2 += 4;
+  if (y2 > H - 60) y2 = newPage(pdf, av, "Componentes Essenciais do Relatório");
+  y2 = sectionTitle(pdf, "Componentes Essenciais do Relatório", y2);
+  COMPONENTES_RELATORIO.forEach((c) => {
+    if (y2 > H - 30) y2 = newPage(pdf, av, "Componentes Essenciais (cont.)");
+    pdf.setFont("helvetica", "bold"); pdf.setFontSize(10); pdf.setTextColor(...NAVY);
+    pdf.text(c.titulo, 20, y2);
+    y2 += 5;
+    y2 = paragraph(pdf, c.texto, y2, W);
+    y2 += 3;
+  });
+
+  // ---------- IDENTIFICAÇÃO DA EMPRESA E RESPONSÁVEL TÉCNICO ----------
+  y2 = newPage(pdf, av, "Identificação da Empresa e Responsável Técnico");
+  y2 = sectionTitle(pdf, "Dados da Empresa Avaliada", y2);
+  const empresaRows: [string, string][] = [
+    ["Razão Social", IDENTIFICACAO_EMPRESA.razaoSocial],
+    ["CNPJ", IDENTIFICACAO_EMPRESA.cnpj],
+    ["Endereço", IDENTIFICACAO_EMPRESA.endereco],
+    ["Data da Avaliação", IDENTIFICACAO_EMPRESA.dataAvaliacao],
+    ["Setores Avaliados", IDENTIFICACAO_EMPRESA.setoresAvaliados],
+  ];
+  empresaRows.forEach(([k, v]) => {
+    pdf.setFont("helvetica", "bold"); pdf.setFontSize(8.5); pdf.setTextColor(...MUTED);
+    pdf.text(k.toUpperCase(), 20, y2);
+    pdf.setFont("helvetica", "normal"); pdf.setFontSize(10); pdf.setTextColor(...NAVY);
+    pdf.text(v, 65, y2);
+    y2 += 6;
+  });
+  y2 += 2;
+  y2 = paragraph(pdf, IDENTIFICACAO_EMPRESA.contexto, y2, W);
+  y2 += 4;
+
+  if (y2 > H - 70) y2 = newPage(pdf, av, "Responsável Técnico pela Avaliação");
+  y2 = sectionTitle(pdf, "Responsável Técnico pela Avaliação", y2);
+  const respRows: [string, string][] = [
+    ["Nome", RESPONSAVEL_TECNICO.nome],
+    ["Registro Profissional", RESPONSAVEL_TECNICO.registroProfissional],
+    ["Especialidade", RESPONSAVEL_TECNICO.especialidade],
+    ["Contato", RESPONSAVEL_TECNICO.contato],
+  ];
+  respRows.forEach(([k, v]) => {
+    pdf.setFont("helvetica", "bold"); pdf.setFontSize(8.5); pdf.setTextColor(...MUTED);
+    pdf.text(k.toUpperCase(), 20, y2);
+    pdf.setFont("helvetica", "normal"); pdf.setFontSize(10); pdf.setTextColor(...NAVY);
+    pdf.text(v, 65, y2);
+    y2 += 6;
+  });
+  y2 += 2;
+  y2 = paragraph(pdf, RESPONSAVEL_TECNICO.texto, y2, W);
+
+  // ---------- METODOLOGIA DETALHADA E DIMENSÕES ----------
+  y2 = newPage(pdf, av, "Metodologia Detalhada e Dimensões Avaliadas");
+  y2 = paragraph(pdf, METODOLOGIA_DETALHADA, y2, W);
+  y2 += 4;
+  y2 = sectionTitle(pdf, "Dimensões Contempladas no Instrumento", y2);
+  DIMENSOES_AVALIADAS.forEach((d) => {
+    if (y2 > H - 15) y2 = newPage(pdf, av, "Dimensões Contempladas (cont.)");
+    pdf.setFillColor(...ORANGE); pdf.circle(22, y2 - 1.2, 0.8, "F");
+    pdf.setFont("helvetica", "normal"); pdf.setFontSize(9.5); pdf.setTextColor(40);
+    const lines = pdf.splitTextToSize(d, W - 50);
+    pdf.text(lines, 26, y2);
+    y2 += lines.length * 4.5 + 1;
+  });
+  y2 += 4;
+
+  // Perfil dos participantes (a partir dos dados da avaliação)
+  if (y2 > H - 60) y2 = newPage(pdf, av, "Perfil dos Participantes");
+  y2 = sectionTitle(pdf, "Perfil dos Participantes", y2);
+  const adesaoP = (av.totalRespondentes / av.totalConvidados) * 100;
+  const perfilRows: [string, string][] = [
+    ["Total de Respondentes", `${av.totalRespondentes} de ${av.totalConvidados} (${adesaoP.toFixed(1)}%)`],
+    ["Período de Aplicação", av.dataAplicacao],
+    ["Foco", av.departamentoFoco],
+    ["Responsável", av.responsavel],
+  ];
+  perfilRows.forEach(([k, v]) => {
+    pdf.setFont("helvetica", "bold"); pdf.setFontSize(8.5); pdf.setTextColor(...MUTED);
+    pdf.text(k.toUpperCase(), 20, y2);
+    pdf.setFont("helvetica", "normal"); pdf.setFontSize(10); pdf.setTextColor(...NAVY);
+    const vLines = pdf.splitTextToSize(v, W - 90);
+    pdf.text(vLines, 70, y2);
+    y2 += Math.max(6, vLines.length * 5 + 1);
+  });
+
   // ---------- PAGE 2: RESUMO EXECUTIVO ----------
   pdf.addPage();
   let y = drawPageHeader(pdf, av, "Resumo Executivo");
