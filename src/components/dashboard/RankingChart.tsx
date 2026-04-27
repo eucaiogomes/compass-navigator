@@ -55,7 +55,7 @@ export const RankingChart = ({
   // ===== BARS (horizontal) — original layout =====
   if (type === "bars") {
     return (
-      <div className="space-y-2.5">
+      <div className="space-y-2 md:space-y-2.5">
         {top.map((d) => {
           const pct = (d.score / 4) * 100;
           const color = colorFor(d.score);
@@ -63,25 +63,25 @@ export const RankingChart = ({
           return (
             <div
               key={d.dimension}
-              className="grid grid-cols-[1fr_88px] gap-3 items-end"
+              className="grid grid-cols-[1fr_75px] md:grid-cols-[1fr_88px] gap-2 md:gap-3 items-end"
             >
               <div className="min-w-0">
-                <div className="text-[12px] font-medium text-foreground mb-1 truncate">
+                <div className="text-[11px] md:text-[12px] font-medium text-foreground mb-0.5 md:mb-1 truncate">
                   {d.dimension}
                 </div>
-                <div className="h-5 bg-muted/70 rounded-full overflow-hidden relative">
+                <div className="h-4 md:h-5 bg-muted/70 rounded-full overflow-hidden relative">
                   <div
-                    className="h-full rounded-full flex items-center justify-end pr-2.5 transition-all"
+                    className="h-full rounded-full flex items-center justify-end pr-2 md:pr-2.5 transition-all"
                     style={{ width: `${Math.max(pct, 8)}%`, background: color }}
                   >
-                    <span className="text-[10px] font-bold text-white drop-shadow-sm">
+                    <span className="text-[9px] md:text-[10px] font-bold text-white drop-shadow-sm">
                       {d.score.toFixed(2)}
                     </span>
                   </div>
                 </div>
               </div>
               <span
-                className="text-[10px] font-bold uppercase tracking-wider text-right pb-0.5"
+                className="text-[9px] md:text-[10px] font-bold uppercase tracking-wider text-right pb-0.5 truncate"
                 style={{ color }}
               >
                 {label}
@@ -107,10 +107,10 @@ export const RankingChart = ({
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
             <XAxis
               dataKey="name"
-              tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
-              angle={-35}
+              tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))" }}
+              angle={-45}
               textAnchor="end"
-              height={70}
+              height={80}
             />
             <YAxis
               domain={[0, 4]}
@@ -145,8 +145,20 @@ export const RankingChart = ({
     }));
     const totalScore = chartData.reduce((s, d) => s + d.value, 0);
     return (
-      <div className="flex flex-col md:flex-row items-center gap-4">
-        <div style={{ height, maxWidth: "100%", width: "min(100%, " + height + "px)" }} className="shrink-0 relative mx-auto">
+      <div className="flex flex-col md:flex-row items-center gap-3 md:gap-4">
+        <style>{`
+          .pie-wrapper-${type} {
+            height: 200px !important;
+            width: 200px !important;
+          }
+          @media (min-width: 768px) {
+            .pie-wrapper-${type} {
+              height: ${height}px !important;
+              width: ${height}px !important;
+            }
+          }
+        `}</style>
+        <div className={`shrink-0 relative mx-auto pie-wrapper-${type}`}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -181,10 +193,10 @@ export const RankingChart = ({
             </div>
           )}
         </div>
-        <div className="flex-1 w-full grid grid-cols-1 gap-1.5 max-h-[320px] overflow-auto pr-1">
+        <div className="flex-1 w-full grid grid-cols-1 gap-1 md:gap-1.5 max-h-[190px] md:max-h-[320px] overflow-hidden md:overflow-auto pr-1">
           {chartData.map((d) => (
-            <div key={d.name} className="flex items-center gap-2 text-[11px]">
-              <span className="h-2.5 w-2.5 rounded-sm shrink-0" style={{ background: d.color }} />
+            <div key={d.name} className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-[11px]">
+              <span className="h-2 w-2 md:h-2.5 md:w-2.5 rounded-sm shrink-0" style={{ background: d.color }} />
               <span className="flex-1 truncate text-foreground">{d.name}</span>
               <span className="font-bold tabular-nums text-primary">{d.value.toFixed(2)}</span>
             </div>
@@ -202,9 +214,9 @@ export const RankingChart = ({
       score: Number(d.score.toFixed(2)),
     }));
     return (
-      <div style={{ height }}>
+      <div className="h-[240px] md:h-[320px]">
         <ResponsiveContainer width="100%" height="100%">
-          <RadarChart data={chartData} outerRadius="65%" margin={{ top: 10, right: 25, bottom: 10, left: 25 }}>
+          <RadarChart data={chartData} outerRadius="60%" margin={{ top: 15, right: 30, bottom: 15, left: 30 }}>
             <PolarGrid stroke="hsl(var(--border))" />
             <PolarAngleAxis
               dataKey="dimension"
