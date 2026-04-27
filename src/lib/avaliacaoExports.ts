@@ -370,6 +370,85 @@ export function exportAvaliacaoPDF(av: Avaliacao) {
     y += lines.length * 4 + 2;
   });
 
+  // ---------- ANÁLISE GLOBAL ----------
+  y = newPage(pdf, av, "Análise Global dos Resultados");
+  y = paragraph(pdf, ANALISE_GLOBAL_TEXTO, y, W);
+  y += 4;
+
+  // Resumo numérico das dimensões (mini-tabela)
+  pdf.setFont("helvetica", "bold"); pdf.setFontSize(8); pdf.setTextColor(...NAVY);
+  pdf.setFillColor(...LIGHT); pdf.rect(20, y, W - 40, 7, "F");
+  pdf.text("DIMENSÃO", 23, y + 5);
+  pdf.text("SCORE", W - 60, y + 5);
+  pdf.text("CLASSIFICAÇÃO", W - 38, y + 5);
+  y += 7;
+  av.ranking.forEach((d) => {
+    if (y > H - 20) y = newPage(pdf, av, "Análise Global (cont.)");
+    const cl = classificacaoTexto(d.score);
+    const c = colorForScore(d.score);
+    pdf.setFont("helvetica", "normal"); pdf.setFontSize(8.5); pdf.setTextColor(40);
+    pdf.text(d.dimension, 23, y + 5);
+    pdf.text(d.score.toFixed(2), W - 60, y + 5);
+    pdf.setFont("helvetica", "bold"); pdf.setTextColor(...c);
+    pdf.text(cl.label, W - 38, y + 5);
+    y += 6.5;
+    pdf.setDrawColor(230, 234, 240); pdf.line(20, y, W - 20, y);
+  });
+  y += 6;
+
+  // ---------- RECOMENDAÇÕES POR DOMÍNIO ----------
+  y = newPage(pdf, av, "Recomendações Técnicas por Domínio");
+  y = paragraph(pdf, "Recomendações organizadas por grandes domínios psicossociais, complementares ao plano de ação detalhado por dimensão. Aplicáveis como diretriz geral de intervenção.", y, W);
+  y += 4;
+  RECOMENDACOES_POR_DOMINIO.forEach((g) => {
+    if (y > H - 50) y = newPage(pdf, av, "Recomendações por Domínio (cont.)");
+    pdf.setFillColor(...NAVY); pdf.roundedRect(20, y, W - 40, 8, 1.5, 1.5, "F");
+    pdf.setTextColor(255); pdf.setFont("helvetica", "bold"); pdf.setFontSize(10);
+    pdf.text(g.dominio, 23, y + 5.5);
+    y += 11;
+    pdf.setTextColor(40); pdf.setFont("helvetica", "normal"); pdf.setFontSize(9);
+    g.acoes.forEach((a) => {
+      const lines = pdf.splitTextToSize(`•  ${a}`, W - 50);
+      if (y + lines.length * 4 > H - 20) y = newPage(pdf, av, "Recomendações por Domínio (cont.)");
+      pdf.text(lines, 25, y);
+      y += lines.length * 4 + 1;
+    });
+    y += 4;
+  });
+
+  // ---------- INTEGRAÇÃO AO PGR + REAPLICAÇÃO ----------
+  if (y > H - 80) y = newPage(pdf, av, "Integração ao PGR e Critérios de Reaplicação");
+  else y = sectionTitle(pdf, "Integração ao Plano de Ação do PGR", y);
+  y = paragraph(pdf, INTEGRACAO_PGR, y, W);
+  y += 4;
+
+  if (y > H - 60) y = newPage(pdf, av, "Critérios de Reaplicação");
+  y = sectionTitle(pdf, "Critérios de Reaplicação Antecipada", y);
+  y = paragraph(pdf, REAPLICACAO_CRITERIOS.observacao, y, W);
+  y += 2;
+  pdf.setFont("helvetica", "bold"); pdf.setFontSize(9); pdf.setTextColor(...NAVY);
+  pdf.text("Gatilhos para reaplicação fora do ciclo padrão:", 20, y);
+  y += 6;
+  REAPLICACAO_CRITERIOS.gatilhos.forEach((g) => {
+    if (y > H - 15) y = newPage(pdf, av, "Critérios de Reaplicação (cont.)");
+    pdf.setFillColor(...ORANGE); pdf.circle(22, y - 1.2, 0.8, "F");
+    pdf.setFont("helvetica", "normal"); pdf.setFontSize(9.5); pdf.setTextColor(40);
+    pdf.text(g, 26, y); y += 5.5;
+  });
+  y += 4;
+
+  // ---------- CONCLUSÃO ----------
+  if (y > H - 60) y = newPage(pdf, av, "Conclusão");
+  else y = sectionTitle(pdf, "Conclusão", y);
+  y = paragraph(pdf, CONCLUSAO_TEXTO, y, W);
+  y += 6;
+  pdf.setDrawColor(...ORANGE); pdf.setLineWidth(0.6); pdf.line(20, y, W - 20, y);
+  y += 6;
+  pdf.setFont("helvetica", "bold"); pdf.setFontSize(9.5); pdf.setTextColor(...NAVY);
+  pdf.text(`Relatório elaborado por: ${av.responsavel}`, 20, y); y += 5;
+  pdf.setFont("helvetica", "normal"); pdf.setFontSize(9); pdf.setTextColor(...MUTED);
+  pdf.text(`Data de emissão: ${today}`, 20, y);
+
   // ---------- FOOTERS ----------
   const pages = pdf.getNumberOfPages();
   for (let i = 2; i <= pages; i++) {
