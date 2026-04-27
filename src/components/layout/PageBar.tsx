@@ -5,13 +5,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PeriodFilterPopover, PeriodFilter } from "./PeriodFilterPopover";
 
 interface Props {
   breadcrumb: { label: string; accent?: boolean }[];
   filterLabel?: string;
   filterOptions?: string[];
   onFilterChange?: (value: string) => void;
-  periodLabel?: string;
+  periodoFiltro?: PeriodFilter;
+  onPeriodoChange?: (periodo: PeriodFilter) => void;
   onAdd?: () => void;
   availableToAdd?: { id: string; name: string; disabled: boolean }[];
   onAddId?: (id: string) => void;
@@ -22,7 +24,8 @@ export const PageBar = ({
   filterLabel = "Todos",
   filterOptions,
   onFilterChange,
-  periodLabel = "Abril - 2026",
+  periodoFiltro,
+  onPeriodoChange,
   onAdd,
   availableToAdd,
   onAddId,
@@ -62,10 +65,14 @@ export const PageBar = ({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <button className="flex items-center justify-between gap-2 min-w-[170px] h-10 px-4 rounded-full border border-border bg-white text-sm text-muted-foreground hover:border-primary/30 transition-colors">
-          <span>{periodLabel}</span>
-          <Calendar className="h-4 w-4 text-muted-foreground" strokeWidth={2} />
-        </button>
+        {periodoFiltro && onPeriodoChange ? (
+          <PeriodFilterPopover periodo={periodoFiltro} onApply={onPeriodoChange} />
+        ) : (
+          <button className="flex items-center justify-between gap-2 min-w-[170px] h-10 px-4 rounded-full border border-border bg-white text-sm text-muted-foreground hover:border-primary/30 transition-colors">
+            <span>Todos os períodos</span>
+            <Calendar className="h-4 w-4 text-muted-foreground" strokeWidth={2} />
+          </button>
+        )}
 
         {availableToAdd ? (
           <DropdownMenu>

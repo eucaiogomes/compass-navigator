@@ -11,13 +11,18 @@ const Index = () => {
   const [exporting, setExporting] = useState<{ id: string; type: "pdf" | "xlsx" } | null>(null);
   const [setorFiltro, setSetorFiltro] = useState<string>("Todos");
   const [visibleIds, setVisibleIds] = useState<string[]>(AVALIACOES.map((a) => a.id));
+  const [periodoFiltro, setPeriodoFiltro] = useState({ mes: "Abril", ano: "2026" });
 
   const setores = Array.from(new Set(AVALIACOES.map((a) => a.departamentoFoco)));
   const filterOptions = ["Todos", ...setores];
 
   const avaliacoesFiltradas = AVALIACOES
     .filter((a) => visibleIds.includes(a.id))
-    .filter((a) => setorFiltro === "Todos" ? true : a.departamentoFoco === setorFiltro);
+    .filter((a) => setorFiltro === "Todos" ? true : a.departamentoFoco === setorFiltro)
+    .filter((a) => {
+      if (!periodoFiltro || !periodoFiltro.mes) return true;
+      return a.periodo.includes(periodoFiltro.mes) && a.periodo.includes(periodoFiltro.ano);
+    });
 
   const availableToAdd = AVALIACOES.map((a) => ({
     id: a.id,
@@ -76,7 +81,8 @@ const Index = () => {
             filterLabel={setorFiltro}
             filterOptions={filterOptions}
             onFilterChange={setSetorFiltro}
-            periodLabel="Abril - 2026"
+            periodoFiltro={periodoFiltro}
+            onPeriodoChange={setPeriodoFiltro}
             availableToAdd={availableToAdd}
             onAddId={handleAddId}
           />
