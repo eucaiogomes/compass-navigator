@@ -50,7 +50,7 @@ const Index = () => {
     }
   };
 
-  const items = AVALIACOES.map((av) => ({
+  const items = avaliacoesFiltradas.map((av) => ({
     id: av.id,
     defaultH: 14,
     defaultW: 6,
@@ -77,7 +77,9 @@ const Index = () => {
               { label: "Minha Área" },
               { label: "NR-1", accent: true },
             ]}
-            filterLabel="Todos"
+            filterLabel={setorFiltro}
+            filterOptions={filterOptions}
+            onFilterChange={setSetorFiltro}
             periodLabel="Abril - 2026"
             onAdd={() => toast.info("Nova avaliação — em breve")}
           />
