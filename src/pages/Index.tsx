@@ -10,14 +10,28 @@ import { toast } from "sonner";
 const Index = () => {
   const [exporting, setExporting] = useState<{ id: string; type: "pdf" | "xlsx" } | null>(null);
   const [setorFiltro, setSetorFiltro] = useState<string>("Todos");
+  const [visibleIds, setVisibleIds] = useState<string[]>(AVALIACOES.map((a) => a.id));
 
   const setores = Array.from(new Set(AVALIACOES.map((a) => a.departamentoFoco)));
   const filterOptions = ["Todos", ...setores];
 
-  const avaliacoesFiltradas =
-    setorFiltro === "Todos"
-      ? AVALIACOES
-      : AVALIACOES.filter((a) => a.departamentoFoco === setorFiltro);
+  const avaliacoesFiltradas = AVALIACOES
+    .filter((a) => visibleIds.includes(a.id))
+    .filter((a) => setorFiltro === "Todos" ? true : a.departamentoFoco === setorFiltro);
+
+  const availableToAdd = AVALIACOES.map((a) => ({
+    id: a.id,
+    name: a.nome,
+    disabled: visibleIds.includes(a.id),
+  }));
+
+  const handleAddId = (id: string) => {
+    setVisibleIds((prev) => [...prev, id]);
+  };
+
+  const handleRemove = (id: string) => {
+    setVisibleIds((prev) => prev.filter((vId) => vId !== id));
+  };
 
   const handlePDF = async (av: Avaliacao) => {
     setExporting({ id: av.id, type: "pdf" });
@@ -63,7 +77,8 @@ const Index = () => {
             filterOptions={filterOptions}
             onFilterChange={setSetorFiltro}
             periodLabel="Abril - 2026"
-            onAdd={() => toast.info("Nova avaliação — em breve")}
+            availableToAdd={availableToAdd}
+            onAddId={handleAddId}
           />
 
           <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -74,6 +89,7 @@ const Index = () => {
                   onExportPDF={handlePDF}
                   onExportXLS={handleXLS}
                   exporting={exporting}
+                  onRemove={handleRemove}
                 />
               </div>
             ))}
