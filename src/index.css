@@ -10,9 +10,9 @@
 
 /* Vitrine brand tokens */
 :root {
-  --vitrine-primary: #324F7F;
-  --vitrine-secondary: #062365;
-  --vitrine-accent: #3b82f6;
+  --vitrine-primary: #ef8206;
+  --vitrine-secondary: #cc6a00;
+  --vitrine-accent: #f59e0b;
 }
 
 @layer utilities {
